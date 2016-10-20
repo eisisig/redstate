@@ -1,0 +1,32 @@
+{
+  "name": "redstate",
+  "version": "1.0.0",
+  "description": "Thin wrapper to start reduxing right away",
+  "main": "lib/index.js",
+  "files": [
+    "lib/",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "dev": "babel src --out-dir lib --watch",
+    "build": "babel src --out-dir lib",
+    "prepublish": "npm run build"
+  },
+  "keywords": [],
+  "author": "Eisi Sig",
+  "license": "MIT",
+  "dependencies": {
+    "find-config": "^1.0.0",
+    "redux": "^3.6.0",
+    "redux-act": "^1.1.0",
+    "redux-promise": "^0.5.3",
+    "redux-thunk": "^2.1.0",
+    "reselect": "^2.5.4"
+  },
+  "devDependencies": {
+    "babel-preset-latest": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-preset-stage-1": "^6.16.0"
+  }
+}
