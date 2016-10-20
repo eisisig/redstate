@@ -19,8 +19,8 @@
 ## TODO
 
 - [ ] Add devTools
-- [ ] createTypes method
-- [ ] 
+- [x] createTypes method
+- [x] composeSelectors
 
 ## Usage
 
