@@ -28,5 +28,13 @@
     "babel-preset-latest": "^6.16.0",
     "babel-preset-react": "^6.16.0",
     "babel-preset-stage-1": "^6.16.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eisisig/redstate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eisisig/redstate/issues"
+  },
+  "homepage": "https://github.com/eisisig/redstate#readme"
 }
