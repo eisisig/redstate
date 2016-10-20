@@ -1,5 +1,7 @@
 # redstate
 
+> Idea taken from [https://github.com/luisvinicius167/mockstate]() which I really liked. Props to @luisvinicius167
+
 > ### WIP - This is a test project and for now just a POC for alternative way of using redux.
 
 > NOTE: this is a single store setup
