@@ -2,19 +2,22 @@ import thunk from 'redux-thunk'
 import findConfig from 'find-config'
 import promiseMiddleware from 'redux-promise'
 import { applyMiddleware, createStore, combineReducers, compose } from 'redux'
-import { createAction as _createAction, createReducer as _createReducer } from 'redux-act'
+import { createAction as _createAction } from 'redux-act'
+import _createReducer from './createReducer'
+
+export compose from 'lodash/fp/compose'
+export { createSelector } from 'reselect'
+export { connect, Provider } from 'react-redux'
 
 const INSTANCE = {
 	store: undefined,
-	reducers: null,
+	reducers: state => state,
 	middleware: [
 		thunk,
 		promiseMiddleware
 	],
 	enhancers: []
 }
-
-export { createSelector } from 'reselect'
 
 export function dispatch ( action ) {
 	const isArray = action instanceof Array
@@ -32,7 +35,7 @@ export function createReducer ( initialState, handlers ) {
 	const hasSingleReducer = INSTANCE.reducers && typeof INSTANCE.reducers === 'function'
 
 	if ( hasSingleReducer ) {
-		console.warn('You are about to replace a single reducer. If you want named reducers use createNamedReducer')
+		// console.warn('You are about to replace a single reducer. If you want named reducers use createNamedReducer')
 	}
 
 	INSTANCE.reducers = _createReducer(handlers, initialState)
@@ -89,11 +92,16 @@ export default (function redstate () {
 	try {
 		const config = findConfig.require('configureStore.js', { module: true })
 
+		if ( !config ) {
+			throw new Error('No config')
+		}
+
 		if ( config.initialState ) {
 			INSTANCE.initialState = config.initialState
 		}
 
 		if ( config.reducers ) {
+
 			if ( config && config.reducers ) {
 				if ( typeof config.reducers === 'function' ) {
 					INSTANCE.reducers = config.reducers
@@ -101,8 +109,6 @@ export default (function redstate () {
 					INSTANCE.reducers = combineReducers({ ...config.reducers })
 				}
 			}
-		} else {
-			INSTANCE.reducers = state => state
 		}
 
 		if ( config.middlewares ) {
