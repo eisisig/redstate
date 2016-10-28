@@ -29,6 +29,10 @@ export function dispatch ( action ) {
 
 }
 
+export function getStore () {
+	return INSTANCE.store
+}
+
 export function createReducer ( initialState, handlers ) {
 
 	const hasSingleReducer = INSTANCE.reducers && typeof INSTANCE.reducers === 'function'
@@ -88,6 +92,8 @@ export function composeSelectors ( ...funcs ) {
 
 export default (function redstate () {
 
+	console.log('index: redstate')
+
 	INSTANCE.store = createStore(
 		INSTANCE.reducers,
 		INSTANCE.initialState,
@@ -96,5 +102,7 @@ export default (function redstate () {
 			...INSTANCE.enhancers
 		)
 	)
+
+	return INSTANCE.store
 
 }())
