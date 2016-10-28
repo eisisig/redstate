@@ -89,37 +89,6 @@ export function composeSelectors ( ...funcs ) {
 
 export default (function redstate () {
 
-	try {
-		const config = findConfig.require('configureStore.js', { module: true })
-
-		if ( !config ) {
-			throw new Error('No config')
-		}
-
-		if ( config.initialState ) {
-			INSTANCE.initialState = config.initialState
-		}
-
-		if ( config.reducers ) {
-
-			if ( config && config.reducers ) {
-				if ( typeof config.reducers === 'function' ) {
-					INSTANCE.reducers = config.reducers
-				} else {
-					INSTANCE.reducers = combineReducers({ ...config.reducers })
-				}
-			}
-		}
-
-		if ( config.middlewares ) {
-			INSTANCE.middleware = INSTANCE.middleware.concat(config.middlewares)
-		}
-
-		if ( config.enhancers ) {
-			INSTANCE.enhancers = INSTANCE.enhancers.concat(config.enhancers)
-		}
-	} catch ( e ) {}
-
 	INSTANCE.store = createStore(
 		INSTANCE.reducers,
 		INSTANCE.initialState,
