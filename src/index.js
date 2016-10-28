@@ -1,5 +1,4 @@
 import thunk from 'redux-thunk'
-import findConfig from 'find-config'
 import promiseMiddleware from 'redux-promise'
 import { applyMiddleware, createStore, combineReducers, compose } from 'redux'
 import { createAction as _createAction } from 'redux-act'
