@@ -81,6 +81,10 @@ export function createTypes ( prefix, types ) {
 	}, {})
 }
 
+export function createRootDOMEl () {
+	return document.body.appendChild(document.createElement('div'))
+}
+
 export function composeSelectors ( ...funcs ) {
 	return ( state, ownProps ) => ({
 		...funcs.reduce(( last, func ) => ({
@@ -91,8 +95,6 @@ export function composeSelectors ( ...funcs ) {
 }
 
 export default (function redstate () {
-
-	console.log('index: redstate')
 
 	INSTANCE.store = createStore(
 		INSTANCE.reducers,
