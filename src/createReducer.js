@@ -32,6 +32,7 @@ export default function createReducer ( handlers = {}, initialState ) {
 		const composeState = ( ...funcs ) => pipe(...funcs)(state)
 
 		const enhancedAction = {
+			state,
 			action,
 			initialState,
 			composeState,
@@ -47,7 +48,8 @@ export default function createReducer ( handlers = {}, initialState ) {
 
 		if ( action && handlers[ action.type ] ) {
 
-			const calledReducer = handlers[ action.type ](state, enhancedAction, action.meta)
+			const calledReducer = handlers[ action.type ](enhancedAction, action.meta)
+			// const calledReducer = handlers[ action.type ](state, enhancedAction, action.meta)
 
 			if ( !calledReducer ) console.warn('Action', action.type, 'does not return new or old state!')
 

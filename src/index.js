@@ -4,13 +4,14 @@ import { applyMiddleware, createStore, combineReducers, compose } from 'redux'
 import { createAction as _createAction } from 'redux-act'
 import _createReducer from './createReducer'
 
-export compose from 'lodash/fp/compose'
+export { compose }
 export { createSelector } from 'reselect'
 export { connect, Provider } from 'react-redux'
 
 const INSTANCE = {
 	store: undefined,
 	reducers: state => state,
+	initialState: undefined,
 	middleware: [
 		thunk,
 		promiseMiddleware
@@ -34,28 +35,21 @@ export function getStore () {
 }
 
 export function createReducer ( initialState, handlers ) {
-
-	const hasSingleReducer = INSTANCE.reducers && typeof INSTANCE.reducers === 'function'
-
-	if ( hasSingleReducer ) {
-		// console.warn('You are about to replace a single reducer. If you want named reducers use createNamedReducer')
-	}
-
-	INSTANCE.reducers = _createReducer(handlers, initialState)
-	INSTANCE.store.replaceReducer(INSTANCE.reducers)
+	return _createReducer(handlers, initialState)
 }
 
-export function createNamedReducer ( name, initialState, handlers ) {
-
-	const hasSingleReducer = INSTANCE.reducers && typeof INSTANCE.reducers === 'function'
-
-	if ( hasSingleReducer ) {
-		console.warn('You are about to replace a single reducer with a named reducer map.')
-		INSTANCE.reducers = {}
+export function registerReducer ( reducer, initialState = INSTANCE.initialState ) {
+	if ( typeof reducer === 'function' ) {
+		INSTANCE.reducers = reducer
+		INSTANCE.store = configureStore(reducer)
+	} else {
+		INSTANCE.reducers = Object.assign({}, INSTANCE.reducers, reducer)
+		INSTANCE.store.replaceReducer(combineReducers(INSTANCE.reducers))
 	}
+}
 
-	INSTANCE.reducers = Object.assign({}, INSTANCE.reducers, { [name]: _createReducer(handlers, initialState) })
-	INSTANCE.store.replaceReducer(combineReducers({ ...INSTANCE.reducers }))
+export function registerReducers ( reducer ) {
+	return registerReducer(reducer)
 }
 
 export function createAction ( ...args ) {
@@ -94,17 +88,18 @@ export function composeSelectors ( ...funcs ) {
 	})
 }
 
-export default (function redstate () {
-
-	INSTANCE.store = createStore(
-		INSTANCE.reducers,
-		INSTANCE.initialState,
+function configureStore ( reducers = INSTANCE.reducers, initialState = INSTANCE.initialState, middleware = INSTANCE.middleware, enhancers = INSTANCE.enhancers ) {
+	return createStore(
+		reducers,
+		initialState,
 		applyMiddleware(
-			...INSTANCE.middleware,
-			...INSTANCE.enhancers
+			...middleware,
+			...enhancers
 		)
 	)
+}
 
+export default (function redstate () {
+	INSTANCE.store = configureStore()
 	return INSTANCE.store
-
 }())

@@ -6,6 +6,34 @@
 
 > NOTE: this is a single store setup
 
+## Purpose
+
+Main purpose of playing around with this is to get rid of more of the "plumbings" needed when creating the "redux" part of our apps.
+
+I found myself always doing import of `connect` from 'react-redux' to get `dispatch`. Or importing the store. Then calling dispatch from this.props, destructured from stateless component or store.dispatch. only to call a simple action.
+
+The solution for me is to have the action auto bound to the store. In all our projects we only have one "store".
+
+The other part is to enhance the returned reducer from `createReducer` with methods that we are always using. That is still in TODO.
+
+I found myself (and my team) always doing the same thing. update, merge, replace the state. And the problem with Object.assign is that sometimes people forgot to add the empty object to make it immutable. That was causing problems.
+
+**WIP**
+
+```js`
+// The methods changing state are using lodash/fp and are curried with the current state so no need to provide that
+({ assign, payload }) => assign(payload)
+// There is also a "compose" method with the current state to compose fp methods
+({ payload, composeState }) => composeState(
+	assign({ items: [1,2,3] }),
+	merge({ settings: { showState: true } })
+)
+ ````
+
+## Problems
+
+- Reducer needs to be created before calling it's actions
+
 ## Libraries used
 
 - redux
@@ -13,22 +41,22 @@
 - redux-act
 - redux-promise
 - reselect
+- recompose (just passthru, 'redstate/recompose')
 
 > Note: Their methods are used inside this lib so not all are exposed or have the same call parameters etc...
 
 ## TODO
 
 - [ ] Add devTools
-- [x] createTypes method
-- [x] composeSelectors
+- [ ] Make recompose a peer-dependency
 
 ## Usage
 
-### Single reducer 
+### Basic example 
 
 ```js
 import axios from 'axios'
-import { createAction, createReducer, getState } from 'redstate'
+import { createAction, createReducer, registerReducers, getState } from 'redstate'
 
 // actions
 const fetch = createAction('FETCH', axios.get('/items'))
@@ -39,46 +67,87 @@ const create = createAction('CREATE')
 const initialState = { items: [] }
 
 // reducer
-const reducer = createReducer({
-	[fetch]: ( state, payload ) => Object.assign({}, state, { items: payload }),
-	[create]: ( state, payload ) => Object.assign({}, state, { items: [ ...state.items, payload ] }),
-	[reset]: ( state ) => Object.assign({}, initialState),
+const accounts = createReducer({
+	[fetch]: ({ state, payload }) => Object.assign({}, state, { items: payload }),
+	[create]: ({ state, payload }) => Object.assign({}, state, { items: [ ...state.items, payload ] }),
+	[reset]: ({ state }) => Object.assign({}, initialState),
 })
 
-getState() // { items: [] }
+registerReducers({ accounts })
+
+getState() // { accounts: { items: [] } }
 fetch()
-getState() // { items: [ { name: 'From server' } ] }
+getState() // { accounts: { items: [ { name: 'From server' } ] } }
 create({ name: 'My item' })
-getState() // { items: [ { name: 'From server' }, { name: 'My item' } ] }
+getState() // { accounts: { items: [ { name: 'From server' }, { name: 'My item' } ] } }
 ```
 
-### Named reducers 
+## methods
+
+#### dispatch
+
+Dispatch is automatically bound to store
+
+#### createAction
+
+Action is automatically bound to store so no need to use dispatch
+
+```
+import store, { dispatch, createAction } from 'redstate'
+
+const FETCH = 'FETCH'
+const action = createAction(FETCH)
+
+// These are all the same
+store.dispatch({ type: FETCH })
+dispatch({ type: FETCH })
+action()
+```
+
+#### createTypes
+
+Creates a namespaced object of constants
 
 ```js
-import axios from 'axios'
-import { createAction, createNamedReducer, getState } from 'redstate'
+// constants.js
+export default createTypes('my-app', [
+	'FETCH',
+	'CREATE'
+	// ...
+])
 
-const accountsFetch = createAction('accounts/FETCH', axios.get('/items'))
+// actions.js
+import { FETCH } from './actions'
 
-const initialState = { items: [] }
-
-createNamedReducer('accounts', { items: [] }, {
-	[accountsFetch]: ( state, payload ) => Object.assign({}, state, { items: payload }),
-})
-
-createNamedReducer('users', [], {
-	[accountsFetch]: ( state, payload ) => Object.assign({}, state, payload ),
-})
-
-getState() // { accounts: { items: [] }, users: [] }
+export const fetch = createAction(FETCH) // { type: 'my-app/FETCH' }
 ```
 
-## Config
+#### createReducer
 
-You can config the initial store startup by creating a config file in your project root directory `onfigureStore.js` At start the script will search for that and use that to initialize.
+Creates an enhanced reducer. The enhancements are in the second parameter called in the action handlers. There you can pull out helpers
 
-### Available properties
+```js
+const initialState = { items: [] }
+const reducer = createReducer(initialState, {
+	[fetch]: ( { state, action, type, meta, initialState, payload, composeState, assign, merge }) => {
+		// TODO: Explain args
+	}
+})
+```
 
-initialState = mixed
-middlewares = array
-reducers = object
+#### createRootDOMEl
+
+Return a dom element to render React app into
+
+```js
+const domEL = createRootDOMEl() // document.body.appendChild(document.createElement('div'))
+ReactDOM.render(<App />, domEl)
+```
+
+#### getStore
+
+Return the redux store
+
+#### getState
+
+Return the current reduc store state `tore.getState()`
