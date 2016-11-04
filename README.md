@@ -10,13 +10,9 @@
 
 Main purpose of playing around with this is to get rid of more of the "plumbings" needed when creating the "redux" part of our apps.
 
-I found myself always doing import of `connect` from 'react-redux' to get `dispatch`. Or importing the store. Then calling dispatch from this.props, destructured from stateless component or store.dispatch. only to call a simple action.
+Easily call auto bound actions without importing or needing the dispatch method and enhanced reducer creator that has helper methods that we are always using
 
-The solution for me is to have the action auto bound to the store. In all our projects we only have one "store".
-
-The other part is to enhance the returned reducer from `createReducer` with methods that we are always using. That is still in TODO.
-
-I found myself (and my team) always doing the same thing. update, merge, replace the state. And the problem with Object.assign is that sometimes people forgot to add the empty object to make it immutable. That was causing problems.
+The helper methods are methods that I found myself (and my team) always doing. update, merge, replace the state. And the problem with Object.assign is that sometimes people forgot to add the empty object to make it immutable. That was causing problems.
 
 **WIP**
 
