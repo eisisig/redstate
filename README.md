@@ -16,7 +16,7 @@ The helper methods are methods that I found myself (and my team) always doing. u
 
 **WIP**
 
-```js`
+```js
 // The methods changing state are using lodash/fp and are curried with the current state so no need to provide that
 ({ assign, payload }) => assign(payload)
 // There is also a "compose" method with the current state to compose fp methods
@@ -24,7 +24,7 @@ The helper methods are methods that I found myself (and my team) always doing. u
 	assign({ items: [1,2,3] }),
 	merge({ settings: { showState: true } })
 )
- ````
+```
 
 ## Problems
 
@@ -146,4 +146,4 @@ Return the redux store
 
 #### getState
 
-Return the current reduc store state `tore.getState()`
+Return the current redux store state `store.getState()`
